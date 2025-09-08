@@ -1,9 +1,8 @@
-const { chromium } = require('playwright');
-const assert = require('assert');
+// jobs/test.spec.js
+const { test, expect } = require('@playwright/test');
 
-(async () => {
-  const browser = await chromium.launch({ headless: false }); // headless: false se browser window dikhegi
-  const page = await browser.newPage();
+test('Wikipedia search test', async ({ page }) => {
+  // Browser aur page automatically handle hota hai Playwright Test me
   await page.goto('https://www.wikipedia.org/');
 
   // Search input field me text likho
@@ -12,18 +11,9 @@ const assert = require('assert');
   // Search button pe click karo
   await page.click('i[data-jsl10n="search-input-button"]');
 
-  // Page load hone tak rukho (title me "Selenium" aane tak)
+  // Page load hone tak rukho
   await page.waitForLoadState('domcontentloaded');
-  const title = await page.title();
-  console.log('Page title:', title);
 
-  assert.strictEqual(
-    title,
-    'Selenium (software) - Wikipedia',
-    'Title did not match'
-  );
-
-  console.log('✅ Title matched successfully');
-
-  await browser.close();
-})();
+  // Title check karo
+  await expect(page).toHaveTitle('Selenium (software) - Wikipedia');
+});
