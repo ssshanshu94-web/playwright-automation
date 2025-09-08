@@ -1,5 +1,5 @@
 // jobs/test.spec.js
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('@playwright');
 
 test('Wikipedia search test', async ({ page }) => {
   // Browser aur page automatically handle hota hai Playwright Test me
