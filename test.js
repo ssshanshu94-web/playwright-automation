@@ -1,36 +1,29 @@
-const { Builder, By, Key, until } = require("selenium-webdriver");
-const assert = require("assert");
+const { chromium } = require('playwright');
+const assert = require('assert');
 
-async function runWikipediaSearch() {
-  let driver = await new Builder().forBrowser("chrome").build();
+(async () => {
+  const browser = await chromium.launch({ headless: false }); // headless: false se browser window dikhegi
+  const page = await browser.newPage();
+  await page.goto('https://www.wikipedia.org/');
 
-  try {
-    await driver.get("https://www.wikipedia.org/");
+  // Search input field me text likho
+  await page.fill('input[name="search"]', 'Selenium (software)');
 
-    // Search input field pe text likho
-    let searchInput = await driver.findElement(By.xpath("//input[@name='search']"));
-    await searchInput.sendKeys("Selenium (software)");
+  // Search button pe click karo
+  await page.click('i[data-jsl10n="search-input-button"]');
 
-    let searchButton = await driver.findElement(By.xpath("//i[@data-jsl10n='search-input-button']"));
-    await searchButton.click();
+  // Page load hone tak rukho (title me "Selenium" aane tak)
+  await page.waitForLoadState('domcontentloaded');
+  const title = await page.title();
+  console.log('Page title:', title);
 
-    // Page load hone tak rukho (title me "Selenium" aane tak)
-    await driver.wait(until.titleContains("Selenium"), 5000);
-    let title = await driver.getTitle();
-    console.log("Page title:", title);
+  assert.strictEqual(
+    title,
+    'Selenium (software) - Wikipedia',
+    'Title did not match'
+  );
 
-    assert.strictEqual(
-      title,
-      "Selenium (software) - ikipedia",
-      "Title did not match"
-    );
+  console.log('✅ Title matched successfully');
 
-    console.log("✅ Title matched successfully");
-  } catch (error) {
-    console.error("❌ Test failed:", error);
-  } finally {
-    await driver.quit();
-  }
-}
-
-runWikipediaSearch();
+  await browser.close();
+})();
